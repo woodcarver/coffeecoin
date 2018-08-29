@@ -18,14 +18,14 @@ public class Command {
   private String clazz;
   private String method;
 
-  private List<String> args;
+  private List<Object> args;
 
   private static final String[][] commands = {
           { "help", "com.xdd.coffeecoin.commands.HelpCommand", "execute" },
           { "balance", "Transaction", "getBalance" },
           { "log", "Transaction", "getBalance"},
           { "quit", "Transaction", "getBalance" },
-          { "wallet" }
+          { "wallet", "com.xdd.coffeecoin.commands.WalletCommand", "execute" }
   };
 
   public Command() {
@@ -35,7 +35,7 @@ public class Command {
     if (cmdStr == null) {
       return;
     }
-    args = new ArrayList<String>();
+    args = new ArrayList<Object>();
     String[] cmdParts = cmdStr.split(SPERATOR);
     cmd = cmdParts[0];
     for (String cmdPart : cmdParts) {
@@ -56,11 +56,12 @@ public class Command {
   }
 
   public Object execute() throws IllegalAccessException, InstantiationException, ClassNotFoundException, NoSuchMethodException, InvocationTargetException {
-    Class<?> class1 = null;
+    Class<?> clazzz = null;
 
-    class1 = Class.forName(clazz);
-    Method m = class1.getMethod(method, String[].class);
-    return m.invoke(class1.newInstance(), args);
+    clazzz = Class.forName(this.clazz);
+//    Method m = clazzz.getMethod(method, String[].class);
+    Method m = clazzz.getMethod(method, List.class);
+    return m.invoke(clazzz.newInstance(), args);
   }
 
   public String getCmd() {
@@ -87,11 +88,11 @@ public class Command {
     this.method = method;
   }
 
-  public List<String> getArgs() {
+  public List<Object> getArgs() {
     return args;
   }
 
-  public void setArgs(List<String> args) {
+  public void setArgs(List<Object> args) {
     this.args = args;
   }
 
