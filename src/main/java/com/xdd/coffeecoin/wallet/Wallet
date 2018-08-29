@@ -1,0 +1,25 @@
+package com.xdd.coffeecoin.wallet;
+
+import java.security.KeyPair;
+import java.security.KeyPairGenerator;
+import java.security.NoSuchAlgorithmException;
+import java.security.SecureRandom;
+
+/**
+ * Created by qingying.xdd on 18/8/29.
+ */
+public class Wallet {
+  private final String ALGORITHMS = "RSA";
+  private final int KEY_SIZE = 1024;
+
+  private String privateKey;
+  private String publicKey;
+
+  public KeyPair generateKeyPair() throws NoSuchAlgorithmException {
+    SecureRandom secureRandom = new SecureRandom();
+    KeyPairGenerator keyPairGenerator = KeyPairGenerator.getInstance(ALGORITHMS);
+    keyPairGenerator.initialize(KEY_SIZE, secureRandom);
+
+    return keyPairGenerator.generateKeyPair();
+  }
+}
