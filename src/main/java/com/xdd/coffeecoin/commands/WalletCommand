@@ -1,0 +1,65 @@
+package com.xdd.coffeecoin.commands;
+
+import com.xdd.coffeecoin.wallet.Wallet;
+import sun.misc.BASE64Encoder;
+
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.ObjectOutputStream;
+import java.security.Key;
+import java.security.KeyPair;
+import java.security.NoSuchAlgorithmException;
+import java.util.List;
+
+/**
+ * Created by qingying.xdd on 18/8/29.
+ */
+public class WalletCommand {
+  public Object execute(List<Object> args) {
+    if (args.size() < 2) {
+      return "miss args";
+    }
+    String method = (String)args.get(1);
+    try {
+      if (method.equals("genkey")) {
+        return generateKeys();
+      }
+    } catch (Exception e) {
+      e.printStackTrace();
+      return e.getMessage();
+    }
+    return null;
+  }
+
+
+  public String generateKeys() throws NoSuchAlgorithmException, IOException {
+    Wallet wallet = new Wallet();
+    KeyPair key = wallet.generateKeyPair();
+    Key publicKey = key.getPublic();
+    Key privateKey = key.getPrivate();
+
+    byte[] publicKeyBytes = publicKey.getEncoded();
+    byte[] privateKeyBytes = privateKey.getEncoded();
+
+    String publicKeyBase64 = new BASE64Encoder().encode(publicKeyBytes);
+    String privateBase64 = new BASE64Encoder().encode(privateKeyBytes);
+
+    // store keys to file
+    ObjectOutputStream oos1 = null;
+    ObjectOutputStream oos2 = null;
+    try {
+      oos1 = new ObjectOutputStream(new FileOutputStream("PublicKey"));
+      oos2 = new ObjectOutputStream(new FileOutputStream("PrivateKey"));
+      oos1.writeObject(publicKey);
+      oos2.writeObject(privateKey);
+    } catch (IOException e) {
+      throw e;
+    } finally {
+      oos1.close();
+      oos2.close();
+    }
+
+    return "public key ::: \n" + publicKeyBase64 + " \n private key ::: \n" + privateBase64;
+  }
+}
