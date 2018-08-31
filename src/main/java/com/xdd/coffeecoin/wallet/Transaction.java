@@ -6,6 +6,7 @@ import javax.crypto.IllegalBlockSizeException;
 import javax.crypto.NoSuchPaddingException;
 import java.security.InvalidKeyException;
 import java.security.Key;
+import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 
 /**
@@ -13,27 +14,44 @@ import java.security.NoSuchAlgorithmException;
  * 数据加密： result by using private to encrypt msg
  * 数字签名: result by using public to encrypt msg
  *
- * https://www.jianshu.com/p/aff5492d64f0
+ * https://www.jianshu.com/p/aff5492d64f0  -- for rsa encrypt
+ * https://blog.csdn.net/u014143369/article/details/53156194 -- for sha or md5
  */
 public class Transaction {
-  private Key owner1publicKey;
+  private final String ENCRPT_ALGORITHM = "SHA";
+
+  private String targetAddress;
   private String previousTransactionHash;
   private double amount;
-  private String signature;
+  private byte[] signature;
 
-  public boolean translate(String targetKey, double amount) {
-    return true;
+  public Transaction(String targetAddress, double amount, Key privateKey)
+          throws NoSuchAlgorithmException, InvalidKeyException, BadPaddingException, NoSuchPaddingException, IllegalBlockSizeException {
+    this.targetAddress = targetAddress;
+    this.amount = amount;
+
+    getPreviousTransactionHash();
+    genSignature(privateKey);
   }
 
-  private String getPreviousTransactionHash() {
-    return "previousTransactionHash";
+  private void getPreviousTransactionHash() {
+    previousTransactionHash = "previousTransactionHash";
   }
 
+  private void genSignature(Key privateKey)
+          throws NoSuchAlgorithmException, IllegalBlockSizeException, InvalidKeyException, BadPaddingException, NoSuchPaddingException {
+    MessageDigest messageDigest;
+    messageDigest = MessageDigest.getInstance(ENCRPT_ALGORITHM);
 
-  private byte[] encryptByPrivateKey(byte[] data, byte[] key) throws NoSuchPaddingException, NoSuchAlgorithmException, InvalidKeyException, BadPaddingException, IllegalBlockSizeException {
-    Cipher cipher = Cipher.getInstance(owner1publicKey.getAlgorithm());
-    cipher.init(Cipher.ENCRYPT_MODE, owner1publicKey);
-    return cipher.doFinal(data);
+    byte[] content = messageDigest.digest((targetAddress + previousTransactionHash).getBytes());
+
+    Cipher cipher = Cipher.getInstance(privateKey.getAlgorithm());
+    cipher.init(Cipher.ENCRYPT_MODE, privateKey);
+    signature = cipher.doFinal(content);
+  }
+
+  public String getTargetAddress() {
+    return targetAddress;
   }
 
   public double getAmount() {
