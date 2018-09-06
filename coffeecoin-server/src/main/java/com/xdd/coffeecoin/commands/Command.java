@@ -21,7 +21,7 @@ public class Command {
   private List<Object> args;
 
   private static final String[][] commands = {
-          { "help", "com.xdd.coffeecoin.commands.HelpCommand", "execute" },
+          { "help", "HelpCommand", "execute" },
           { "balance", "Transaction", "getBalance" },
           { "log", "Transaction", "getBalance"},
           { "quit", "Transaction", "getBalance" },
