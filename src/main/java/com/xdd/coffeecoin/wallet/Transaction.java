@@ -25,8 +25,7 @@ public class Transaction {
   private double amount;
   private byte[] signature;
 
-  public Transaction(String targetAddress, double amount, Key privateKey)
-          throws NoSuchAlgorithmException, InvalidKeyException, BadPaddingException, NoSuchPaddingException, IllegalBlockSizeException {
+  public Transaction(String targetAddress, double amount, Key privateKey) throws Exception {
     this.targetAddress = targetAddress;
     this.amount = amount;
 
@@ -39,9 +38,11 @@ public class Transaction {
   }
 
   private void genSignature(Key privateKey)
-          throws NoSuchAlgorithmException, IllegalBlockSizeException, InvalidKeyException, BadPaddingException, NoSuchPaddingException {
-    MessageDigest messageDigest;
-    messageDigest = MessageDigest.getInstance(ENCRPT_ALGORITHM);
+          throws NoSuchAlgorithmException, IllegalBlockSizeException, InvalidKeyException,
+          BadPaddingException, NoSuchPaddingException, IllegalAccessException {
+    if (previousTransactionHash == null) throw new IllegalAccessException("previousTransactionHash is null.");
+
+    MessageDigest messageDigest = MessageDigest.getInstance(ENCRPT_ALGORITHM);
 
     byte[] content = messageDigest.digest((targetAddress + previousTransactionHash).getBytes());
 
