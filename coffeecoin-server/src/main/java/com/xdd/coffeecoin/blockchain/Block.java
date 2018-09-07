@@ -1,5 +1,7 @@
 package com.xdd.coffeecoin.blockchain;
 
+import com.xdd.coffeecoin.consensus.Consensus;
+import com.xdd.coffeecoin.consensus.POS;
 import com.xdd.coffeecoin.wallet.Transaction;
 
 import java.security.MessageDigest;
@@ -12,12 +14,20 @@ public class Block {
   private final String ENCRPT_ALGORITHM = "SHA";
   private final int MAX_ITERATOR = 10;
 
+  private Consensus consensus;
   private Integer once;
   private String preBlockHash;
   private byte[] blockHash;
   private Transaction transactions;
 
   public Block() throws Exception {
+    this.consensus = new POS();
+    genPreBlockHash();
+    genOnce();
+  }
+
+  public Block(Consensus consensus) throws Exception {
+    this.consensus = consensus;
     genPreBlockHash();
     genOnce();
   }
@@ -33,14 +43,10 @@ public class Block {
 
     for (int i = 0; i < MAX_ITERATOR; i++) {
       blockHash = messageDigest.digest((once.toString() + preBlockHash + transactions).getBytes());
-      if (isCorrectAnswer(blockHash)) {
+      if (consensus.isCorrectAnswer(blockHash)) {
         break;
       }
       once++;
     }
-  }
-
-  private boolean isCorrectAnswer(byte[] hashResult) {
-    return true;
   }
 }
